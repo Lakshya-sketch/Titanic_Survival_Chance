@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Stress Predictor</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 2em; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 900px; background-color: #ffffff; padding: 2em; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 0.5em; }
+        p.description { text-align: center; color: #7f8c8d; margin-bottom: 2em; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5em; }
+        .form-group { border: 1px solid #e0e0e0; padding: 1em; border-radius: 5px; }
+        .form-group label.group-title { display: block; margin-bottom: 0.75em; font-weight: 500; color: #34495e; }
+        .radio-group { display: flex; flex-wrap: wrap; gap: 0.5em; }
+        .radio-group input[type="radio"] { opacity: 0; position: fixed; width: 0; }
+        .radio-group .radio-label { display: inline-block; background-color: #ecf0f1; padding: 8px 15px; font-size: 0.9em; border-radius: 20px; cursor: pointer; transition: background-color 0.3s, color 0.3s; }
+        .radio-group input[type="radio"]:checked + .radio-label { background-color: #3498db; color: white; font-weight: bold; }
+        button { display: block; width: 100%; padding: 12px; font-size: 1.1em; font-weight: bold; color: #ffffff; background-color: #27ae60; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s; margin-top: 2em; grid-column: 1 / -1; }
+        button:hover { background-color: #2ecc71; }
+        .result-box { margin-top: 2em; padding: 1.5em; border-radius: 5px; text-align: center; grid-column: 1 / -1; }
+        .result-box.success { background-color: #e8f5e9; border-left: 5px solid #4caf50; }
+        .result-box h2 { margin: 0; color: #2e7d32; }
+        .result-box.error { background-color: #ffebee; border-left: 5px solid #f44336; color: #c62828; font-weight: bold; }
+        @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } body { padding: 1em; } .container { padding: 1.5em; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Student Stress Predictor</h1>
+        <p class="description">Select a value for each category to predict the student's stress level.</p>
+
+        <form action="{% url 'predictor' %}" method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                
+                <div class="form-group"><label class="group-title">Anxiety Level (0-21)</label><div class="radio-group">{% for i in range_0_21 %}<input type="radio" id="anxiety_level_{{ i }}" name="anxiety_level" value="{{ i }}" required><label for="anxiety_level_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Self Esteem (0-30)</label><div class="radio-group">{% for i in range_0_30 %}<input type="radio" id="self_esteem_{{ i }}" name="self_esteem" value="{{ i }}" required><label for="self_esteem_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Mental Health History</label><div class="radio-group"><input type="radio" id="mhh_0" name="mental_health_history" value="0" required><label for="mhh_0" class="radio-label">No</label><input type="radio" id="mhh_1" name="mental_health_history" value="1" required><label for="mhh_1" class="radio-label">Yes</label></div></div>
+                <div class="form-group"><label class="group-title">Depression Score (0-27)</label><div class="radio-group">{% for i in range_0_27 %}<input type="radio" id="depression_{{ i }}" name="depression" value="{{ i }}" required><label for="depression_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Headache Frequency (0-5)</label><div class="radio-group">{% for i in range_0_5 %}<input type="radio" id="headache_{{ i }}" name="headache" value="{{ i }}" required><label for="headache_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Blood Pressure (1-3)</label><div class="radio-group">{% for i in range_1_3 %}<input type="radio" id="bp_{{ i }}" name="blood_pressure" value="{{ i }}" required><label for="bp_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Sleep Quality (0-5)</label><div class="radio-group">{% for i in range_0_5 %}<input type="radio" id="sleep_quality_{{ i }}" name="sleep_quality" value="{{ i }}" required><label for="sleep_quality_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Breathing Problem (0-5)</label><div class="radio-group">{% for i in range_0_5 %}<input type="radio" id="breathing_problem_{{ i }}" name="breathing_problem" value="{{ i }}" required><label for="breathing_problem_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Noise Level (0-5)</label><div class="radio-group">{% for i in range_0_5 %}<input type="radio" id="noise_level_{{ i }}" name="noise_level" value="{{ i }}" required><label for="noise_level_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Living Conditions (0-5)</label><div class="radio-group">{% for i in range_0_5 %}<input type="radio" id="living_conditions_{{ i }}" name="living_conditions" value="{{ i }}" required><label for="living_conditions_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Safety (0-5)</label><div class="radio-group">{% for i in range_0_5 %}<input type="radio" id="safety_{{ i }}" name="safety" value="{{ i }}" required><label for="safety_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Basic Needs (0-5)</label><div class="radio-group">{% for i in range_0_5 %}<input type="radio" id="basic_needs_{{ i }}" name="basic_needs" value="{{ i }}" required><label for="basic_needs_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Academic Performance (0-5)</label><div class="radio-group">{% for i in range_0_5 %}<input type="radio" id="academic_performance_{{ i }}" name="academic_performance" value="{{ i }}" required><label for="academic_performance_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Study Load (0-5)</label><div class="radio-group">{% for i in range_0_5 %}<input type="radio" id="study_load_{{ i }}" name="study_load" value="{{ i }}" required><label for="study_load_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Teacher-Student Relationship (0-5)</label><div class="radio-group">{% for i in range_0_5 %}<input type="radio" id="teacher_student_relationship_{{ i }}" name="teacher_student_relationship" value="{{ i }}" required><label for="teacher_student_relationship_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Future Career Concerns (0-5)</label><div class="radio-group">{% for i in range_0_5 %}<input type="radio" id="future_career_concerns_{{ i }}" name="future_career_concerns" value="{{ i }}" required><label for="future_career_concerns_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Social Support (0-3)</label><div class="radio-group">{% for i in range_0_3 %}<input type="radio" id="social_support_{{ i }}" name="social_support" value="{{ i }}" required><label for="social_support_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Peer Pressure (0-5)</label><div class="radio-group">{% for i in range_0_5 %}<input type="radio" id="peer_pressure_{{ i }}" name="peer_pressure" value="{{ i }}" required><label for="peer_pressure_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Extracurricular Activities (0-5)</label><div class="radio-group">{% for i in range_0_5 %}<input type="radio" id="extracurricular_activities_{{ i }}" name="extracurricular_activities" value="{{ i }}" required><label for="extracurricular_activities_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                <div class="form-group"><label class="group-title">Bullying (0-5)</label><div class="radio-group">{% for i in range_0_5 %}<input type="radio" id="bullying_{{ i }}" name="bullying" value="{{ i }}" required><label for="bullying_{{ i }}" class="radio-label">{{ i }}</label>{% endfor %}</div></div>
+                
+                <button type="submit">Predict Stress Level</button>
+                
+                {% if result %}
+                    <div class="result-box success">
+                        <h2>Prediction Result: {{ result }}</h2>
+                    </div>
+                {% endif %}
+
+                {% if error %}
+                    <div class="result-box error">
+                        <p>{{ error }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>
